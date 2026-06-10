@@ -1,6 +1,7 @@
 import {
   asArray,
   asMaybe,
+  asNumber,
   asObject,
   asOptional,
   asString,
@@ -156,6 +157,9 @@ const asSideshiftTx = asObject({
   prevDepositAddresses: asMaybe(asObject({ address: asMaybe(asString) })),
   depositAsset: asString,
   depositNetwork: asOptional(asString),
+  depositHash: asOptional(asString),
+  depositContractAddress: asOptional(asString),
+  depositEvmChainId: asOptional(asNumber),
   invoiceAmount: asString,
   settleAddress: asObject({
     address: asString
@@ -163,7 +167,11 @@ const asSideshiftTx = asObject({
   settleAmount: asString,
   settleAsset: asString,
   settleNetwork: asOptional(asString),
-  createdAt: asString
+  settleHash: asOptional(asString),
+  settleContractAddress: asOptional(asString),
+  settleEvmChainId: asOptional(asNumber),
+  createdAt: asString,
+  settledAt: asOptional(asString)
 })
 
 const asSideshiftPluginParams = asObject({
@@ -363,7 +371,7 @@ export async function processSideshiftTx(
     status: statusMap[tx.status],
     orderId: tx.id,
     countryCode: null,
-    depositTxid: undefined,
+    depositTxid: tx.depositHash,
     depositAddress,
     depositCurrency: tx.depositAsset,
     depositChainPluginId: depositAsset.chainPluginId,
@@ -373,7 +381,7 @@ export async function processSideshiftTx(
     direction: null,
     exchangeType: 'swap',
     paymentType: null,
-    payoutTxid: undefined,
+    payoutTxid: tx.settleHash,
     payoutAddress: tx.settleAddress.address,
     payoutCurrency: tx.settleAsset,
     payoutChainPluginId: payoutAsset.chainPluginId,
